@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume Optimizer — AI-Powered ATS Engine</title>
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Background canvas noise -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <div class="app-shell">
+
+    <!-- ── HEADER ── -->
+    <header class="site-header animate__animated animate__fadeInDown">
+      <div class="logo-mark">
+        <span class="logo-dot"></span>
+        <span class="logo-text">ResumeAI</span>
+      </div>
+      <p class="header-tagline">Elite ATS Optimization Engine</p>
+    </header>
+
+    <!-- ── PIPELINE TRACKER ── -->
+    <section class="pipeline-section animate__animated animate__fadeIn" style="animation-delay:.15s">
+      <div class="pipeline-wrapper">
+
+        <div class="pipeline-step" id="step1">
+          <div class="step-orb">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <div class="step-content">
+            <span class="step-number">01</span>
+            <span class="step-label">Extract &amp; Parse Profile</span>
+          </div>
+          <div class="step-status-dot"></div>
+        </div>
+
+        <div class="pipeline-connector">
+          <div class="connector-line"></div>
+          <div class="connector-pulse"></div>
+        </div>
+
+        <div class="pipeline-step" id="step2">
+          <div class="step-orb">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div class="step-content">
+            <span class="step-number">02</span>
+            <span class="step-label">ATS Keyword Match Matrix</span>
+          </div>
+          <div class="step-status-dot"></div>
+        </div>
+
+        <div class="pipeline-connector">
+          <div class="connector-line"></div>
+          <div class="connector-pulse"></div>
+        </div>
+
+        <div class="pipeline-step" id="step3">
+          <div class="step-orb">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          </div>
+          <div class="step-content">
+            <span class="step-number">03</span>
+            <span class="step-label">Executive HTML Compile</span>
+          </div>
+          <div class="step-status-dot"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── MAIN INPUT WORKSPACE ── -->
+    <main class="workspace">
+
+      <div class="workspace-grid">
+
+        <!-- Resume Upload Card -->
+        <div class="glass-card upload-card animate__animated animate__fadeInUp" style="animation-delay:.25s">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            </div>
+            <div>
+              <h2 class="card-title">Your Resume</h2>
+              <p class="card-subtitle">PDF, DOCX, or TXT · Max 10 MB</p>
+            </div>
+          </div>
+
+          <label class="drop-zone" id="dropZone" for="resumeFile">
+            <div class="drop-icon">
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="8" y="6" width="48" height="52" rx="4"/><path d="M22 20h20M22 30h20M22 40h12"/><path d="M40 2v14h14" stroke-dasharray="3 2"/></svg>
+            </div>
+            <p class="drop-primary">Drag &amp; drop your resume here</p>
+            <p class="drop-secondary">or click to browse your files</p>
+            <input type="file" id="resumeFile" accept=".pdf,.doc,.docx,.txt" />
+            <div class="file-selected-badge" id="fileSelectedBadge" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+              <span id="fileSelectedName">file.pdf</span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Job Description Card -->
+        <div class="glass-card jd-card animate__animated animate__fadeInUp" style="animation-delay:.35s">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <h2 class="card-title">Target Job Description</h2>
+              <p class="card-subtitle">Paste the full JD for maximum ATS alignment</p>
+            </div>
+          </div>
+          <textarea
+            id="jobDescription"
+            class="jd-textarea"
+            placeholder="Paste the job description here — include responsibilities, requirements, and any keywords you see repeated…"
+            spellcheck="false"
+          ></textarea>
+          <div class="char-count"><span id="charCount">0</span> characters</div>
+        </div>
+
+      </div>
+
+      <!-- CTA Button -->
+      <div class="cta-zone animate__animated animate__fadeInUp" style="animation-delay:.45s">
+        <button id="optimizeBtn" class="optimize-btn">
+          <span class="btn-inner">
+            <span class="btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </span>
+            <span class="btn-text">Optimize Resume Now</span>
+          </span>
+          <span class="btn-shimmer"></span>
+        </button>
+        <p class="cta-note">Powered by AI · Your data is never stored</p>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-overlay" id="loadingOverlay" hidden>
+        <div class="loader-ring"></div>
+        <p class="loader-label" id="loaderLabel">Parsing your resume…</p>
+      </div>
+
+    </main>
+
+    <!-- ── RESULTS BLOCK ── -->
+    <section class="results-section" id="resultsSection" hidden>
+
+      <div class="results-header animate__animated animate__fadeIn">
+        <div class="results-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+          Optimization Complete
+        </div>
+        <h2 class="results-title">Your Optimized Resume</h2>
+        <p class="results-subtitle">ATS-aligned, executive-grade, print-ready.</p>
+      </div>
+
+      <div class="results-grid">
+
+        <div class="glass-card preview-card">
+          <div class="preview-toolbar">
+            <div class="toolbar-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="toolbar-label">Live Preview</span>
+          </div>
+          <div id="resumePreview" class="resume-preview-body"></div>
+        </div>
+
+        <div class="results-actions">
+          <button id="downloadPdfBtn" class="download-btn">
+            <span class="download-btn-inner">
+              <svg class="download-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Download Print-Ready PDF</span>
+            </span>
+          </button>
+
+          <div class="score-card glass-card">
+            <p class="score-label">ATS Match Score</p>
+            <div class="score-ring-wrap">
+              <svg class="score-ring" viewBox="0 0 100 100">
+                <circle class="ring-bg" cx="50" cy="50" r="40"/>
+                <circle class="ring-fill" id="scoreRingFill" cx="50" cy="50" r="40"/>
+              </svg>
+              <span class="score-value" id="scoreValue">—</span>
+            </div>
+            <p class="score-desc">Keywords aligned to JD</p>
+          </div>
+
+          <button class="reset-btn" id="resetBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Start Over
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /app-shell -->
+
+  <script src="app.js"></script>
+</body>
+</html>
