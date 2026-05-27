@@ -1,12 +1,13 @@
 /**
  * ═══════════════════════════════════════════════════
- * RESUME OPTIMIZER — APP.JS (FINAL COMPREHENSIVE FIX)
+ * RESUME OPTIMIZER — APP.JS (VERIFIED PRODUCTION FIX)
  * ═══════════════════════════════════════════════════
  */
 
 /* ─── CONFIGURATION ─────────────────────────────── */
 const DIFY_API_URL = 'https://api.dify.ai/v1/workflows/run';
-const DIFY_API_KEY = 'app-JVFbSppqUU1pAzwmKYL3SDRCL';   
+// ⚠️ SABSE ZARURI: Niche wale single quotes ke andar apni Dify se copy ki hui asli API key paste kijiye
+const DIFY_API_KEY = 'app-JVFbSppqUU1pAzwmKYL3SDRC';   
 
 /* ─── DOM REFERENCES ────────────────────────────── */
 const optimizeBtn        = document.getElementById('optimizeBtn');
@@ -223,7 +224,6 @@ optimizeBtn.addEventListener('click', async () => {
   try {
     const base64 = await fileToBase64(selectedFile);
     
-    // Dify Framework Comprehensive Secure Payload Architecture
     const payload = {
       inputs: {
         uploaded_resume: {
@@ -255,7 +255,6 @@ optimizeBtn.addEventListener('click', async () => {
 
     const data = await response.json();
     
-    // Multi-tier Fallback Parser to extract HTML safely
     optimizedHTML = 
       data?.data?.outputs?.result ||
       data?.data?.outputs?.html ||
@@ -273,7 +272,6 @@ optimizeBtn.addEventListener('click', async () => {
 
     resumePreview.innerHTML = optimizedHTML;
 
-    // Estimate score
     const score = estimateAtsScore(optimizedHTML, jobDescInput.value);
     setTimeout(() => animateScore(score), 400);
 
