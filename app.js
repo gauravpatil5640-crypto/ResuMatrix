@@ -17,8 +17,8 @@
  */
 
 /* ─── CONFIGURATION ─────────────────────────────── */
-const DIFY_API_URL = '/dify-api/v1/workflow/run';
-const DIFY_API_KEY = 'app-H1KzdUeSTFtMhZCzcwQJp5pL';   
+const DIFY_API_URL = 'https://api.dify.ai/v1/chat-messages';
+const DIFY_API_KEY = 'app-JVFbSppqUU1pAzwmKYL3SDRC';   
 
 /* ─── DOM REFERENCES ────────────────────────────── */
 const optimizeBtn        = document.getElementById('optimizeBtn');
