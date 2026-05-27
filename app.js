@@ -1,12 +1,12 @@
 /**
  * ═══════════════════════════════════════════════════
- * RESUME OPTIMIZER — APP.JS (DIFY NATIVE 2-STEP UPLOAD)
+ * RESUME OPTIMIZER — APP.JS (FINAL PRODUCTION DEPLOY)
  * ═══════════════════════════════════════════════════
  */
 
 /* ─── CONFIGURATION ─────────────────────────────── */
 const DIFY_BASE_URL = 'https://api.dify.ai/v1';
-const DIFY_API_KEY  = 'app-JVFbSppqUU1pAzwmKYL3SDRC'; // ⚠️ Apni working API Key ek baar check kar lena yahan
+const DIFY_API_KEY  = 'app-JVFbSppqUU1pAzwmKYL3SDRC'; 
 
 /* ─── DOM REFERENCES ────────────────────────────── */
 const optimizeBtn        = document.getElementById('optimizeBtn');
@@ -210,7 +210,7 @@ async function uploadFileToDify(file) {
   if (!fileData?.id) {
     throw new Error('Dify did not return a valid upload file ID.');
   }
-  return fileData.id; // Returns the valid 'upload_file_id'
+  return fileData.id;
 }
 
 /* ─── CORE OPTIMIZE ENGINE ──────────────────────── */
@@ -234,10 +234,10 @@ optimizeBtn.addEventListener('click', async () => {
   const pipelinePromise = runPipelineAnimation();
 
   try {
-    // Step 1: Upload file to generate native Dify File ID
+    // Step 1: Automated File Upload Pipeline
     const uploadFileId = await uploadFileToDify(selectedFile);
 
-    // Step 2: Build payload using the generated file reference block
+    // Step 2: Native Payload Block Construction
     const payload = {
       inputs: {
         uploaded_resume: {
@@ -251,7 +251,7 @@ optimizeBtn.addEventListener('click', async () => {
       user: 'resume-optimizer-web'
     };
 
-    // Step 3: Run the Workflow
+    // Step 3: Trigger Core Workflow Canvas
     const response = await fetch(`${DIFY_BASE_URL}/workflows/run`, {
       method:  'POST',
       headers: {
@@ -267,17 +267,24 @@ optimizeBtn.addEventListener('click', async () => {
     }
 
     const data = await response.json();
+    console.log('[Dify Live Response Structure]:', data);
     
-    optimizedHTML = 
-      data?.data?.outputs?.result ||
-      data?.data?.outputs?.html ||
-      data?.data?.outputs?.optimized_resume ||
-      data?.outputs?.result ||
-      data?.answer || 
-      null;
+    // Step 4: Robust Unified Production Parser
+    if (data?.data?.outputs) {
+      const outputs = data.data.outputs;
+      optimizedHTML = outputs.result || outputs.html || outputs.optimized_resume || Object.values(outputs)[0];
+    } else if (data?.outputs) {
+      optimizedHTML = data.outputs.result || Object.values(data.outputs)[0];
+    } else {
+      optimizedHTML = data?.answer || JSON.stringify(data);
+    }
+
+    if (typeof optimizedHTML === 'object' && optimizedHTML !== null) {
+      optimizedHTML = optimizedHTML.result || optimizedHTML.text || Object.values(optimizedHTML)[0] || JSON.stringify(optimizedHTML);
+    }
 
     if (!optimizedHTML) {
-      throw new Error('Could not find HTML output in Dify response structure.');
+      throw new Error('Could not parse text output matrix from Dify platform response.');
     }
 
     await pipelinePromise;
