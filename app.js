@@ -1,12 +1,12 @@
 /**
  * ═══════════════════════════════════════════════════
- * RESUME OPTIMIZER — APP.JS (FINAL PRODUCTION FIX)
+ * RESUME OPTIMIZER — APP.JS (FINAL COMPREHENSIVE FIX)
  * ═══════════════════════════════════════════════════
  */
 
 /* ─── CONFIGURATION ─────────────────────────────── */
 const DIFY_API_URL = 'https://api.dify.ai/v1/workflows/run';
-const DIFY_API_KEY = 'app-JVFbSppqUU1pAzwmKYL3SDRC';   
+const DIFY_API_KEY = 'app-H1KzdUeSTFtMhZCzcwQJp5pL';   
 
 /* ─── DOM REFERENCES ────────────────────────────── */
 const optimizeBtn        = document.getElementById('optimizeBtn');
@@ -200,70 +200,6 @@ function showValidationError(messages) {
   }, 3600);
 }
 
-/* ─── API PAYLOAD ENGINE ────────────────────────── */
-async function buildPayload(base64File, fileName, jobDescription) {
-  // Dify standard file data mapping payload pattern
-  return {
-    inputs: {
-      uploaded_resume: base64File,
-      job_description: jobDescription,
-    },
-    response_mode: 'blocking',
-    user: 'resume-optimizer-web',
-  };
-}
-
-function parseResult(data) {
-  const output =
-    data?.data?.outputs?.result ||
-    data?.data?.outputs?.html   ||
-    data?.data?.outputs?.optimized_resume ||
-    data?.outputs?.result       ||
-    data?.answer                ||
-    null;
-
-  if (!output) {
-    throw new Error('Could not find HTML output in Dify response.');
-  }
-  return output;
-}
-
-/* ─── ATS SCORE SYSTEM ──────────────────────────── */
-function animateScore(scorePercent) {
-  const circumference = 2 * Math.PI * 40; 
-  const offset = circumference - (scorePercent / 100) * circumference;
-  scoreRingFill.style.strokeDashoffset = offset;
-  scoreValue.textContent = `${scorePercent}%`;
-
-  if (scorePercent >= 80) {
-    scoreRingFill.style.stroke = '#10b981'; 
-  } else if (scorePercent >= 60) {
-    scoreRingFill.style.stroke = '#f59e0b'; 
-  } else {
-    scoreRingFill.style.stroke = '#3b82f6'; 
-  }
-}
-
-function estimateAtsScore(html, jd) {
-  const jdWords = [...new Set(
-    jd.toLowerCase().match(/\b[a-z][a-z\-]{3,}\b/g) || []
-  )].filter(w => !commonWords.has(w));
-
-  if (jdWords.length === 0) return 72;
-
-  const htmlLower = html.toLowerCase();
-  const matched   = jdWords.filter(w => htmlLower.includes(w)).length;
-  const raw       = Math.round((matched / jdWords.length) * 100);
-
-  return Math.min(98, Math.max(55, raw));
-}
-
-const commonWords = new Set([
-  'the','and','for','with','that','have','this','from','they',
-  'will','been','what','when','your','which','their','about',
-  'would','there','could','other','into','more','also','some',
-]);
-
 /* ─── CORE OPTIMIZE ENGINE ──────────────────────── */
 optimizeBtn.addEventListener('click', async () => {
   if (isProcessing) return;
@@ -286,7 +222,22 @@ optimizeBtn.addEventListener('click', async () => {
 
   try {
     const base64 = await fileToBase64(selectedFile);
-    const payload = await buildPayload(base64, selectedFile.name, jobDescInput.value.trim());
+    
+    // Dify Framework Comprehensive Secure Payload Architecture
+    const payload = {
+      inputs: {
+        uploaded_resume: {
+          transfer_method: 'local_file',
+          upload_file_id: null,
+          data: base64,
+          filename: selectedFile.name,
+          type: 'document'
+        },
+        job_description: jobDescInput.value.trim()
+      },
+      response_mode: 'blocking',
+      user: 'resume-optimizer-web'
+    };
 
     const response = await fetch(DIFY_API_URL, {
       method:  'POST',
@@ -303,13 +254,26 @@ optimizeBtn.addEventListener('click', async () => {
     }
 
     const data = await response.json();
-    optimizedHTML = parseResult(data);
+    
+    // Multi-tier Fallback Parser to extract HTML safely
+    optimizedHTML = 
+      data?.data?.outputs?.result ||
+      data?.data?.outputs?.html ||
+      data?.data?.outputs?.optimized_resume ||
+      data?.outputs?.result ||
+      data?.answer || 
+      null;
+
+    if (!optimizedHTML) {
+      throw new Error('Could not find HTML output in Dify response structure.');
+    }
 
     await pipelinePromise;
     finishPipelineAnimation();
 
     resumePreview.innerHTML = optimizedHTML;
 
+    // Estimate score
     const score = estimateAtsScore(optimizedHTML, jobDescInput.value);
     setTimeout(() => animateScore(score), 400);
 
@@ -335,84 +299,65 @@ optimizeBtn.addEventListener('click', async () => {
   }
 });
 
+/* ─── ATS SCORE SYSTEM ──────────────────────────── */
+function animateScore(scorePercent) {
+  const circumference = 2 * Math.PI * 40; 
+  const offset = circumference - (scorePercent / 100) * circumference;
+  scoreRingFill.style.strokeDashoffset = offset;
+  scoreValue.textContent = `${scorePercent}%`;
+
+  if (scorePercent >= 80) scoreRingFill.style.stroke = '#10b981'; 
+  else if (scorePercent >= 60) scoreRingFill.style.stroke = '#f59e0b'; 
+  else scoreRingFill.style.stroke = '#3b82f6'; 
+}
+
+function estimateAtsScore(html, jd) {
+  const jdWords = [...new Set(
+    jd.toLowerCase().match(/\b[a-z][a-z\-]{3,}\b/g) || []
+  )].filter(w => !commonWords.has(w));
+
+  if (jdWords.length === 0) return 72;
+  const htmlLower = html.toLowerCase();
+  const matched   = jdWords.filter(w => htmlLower.includes(w)).length;
+  return Math.min(98, Math.max(55, Math.round((matched / jdWords.length) * 100)));
+}
+
+const commonWords = new Set([
+  'the','and','for','with','that','have','this','from','they',
+  'will','been','what','when','your','which','their','about'
+]);
+
 /* ─── EXPORT AND RESET ──────────────────────────── */
 downloadPdfBtn.addEventListener('click', () => {
   if (!optimizedHTML) return;
-
   const printWindow = window.open('', '_blank', 'width=900,height=700');
   if (!printWindow) {
     alert('Please allow pop-ups for this site to enable PDF download.');
     return;
   }
-
-  const stylesheetHref = (
-    document.querySelector('link[href*="styles.css"]')?.href ||
-    window.location.origin + '/styles.css'
-  );
-
+  const stylesheetHref = document.querySelector('link[href*="styles.css"]')?.href || window.location.origin + '/styles.css';
   printWindow.document.write(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Optimized Resume</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="${stylesheetHref}" />
-  <style>
-    body { background: #fff !important; color: #111 !important; margin: 0; padding: 0; }
-    #resumePreview { max-height: none !important; overflow: visible !important; padding: 0 !important; }
-  </style>
-</head>
-<body>
-  <div id="resumePreview" class="resume-preview-body">
-    \${optimizedHTML}
-  </div>
-  <script>
-    document.fonts.ready.then(() => {
-      setTimeout(() => {
-        window.print();
-        setTimeout(() => window.close(), 1000);
-      }, 300);
-    });
-  <\/script>
-</body>
-</html>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Optimized Resume</title>
+      <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+      <link rel="stylesheet" href="${stylesheetHref}" />
+      <style>body { background: #fff !important; color: #111 !important; margin: 0; padding: 0; } #resumePreview { max-height: none !important; overflow: visible !important; padding: 0 !important; }</style>
+    </head>
+    <body><div id="resumePreview" class="resume-preview-body">\${optimizedHTML}</div><script>document.fonts.ready.then(() => { setTimeout(() => { window.print(); setTimeout(() => window.close(), 1000); }, 300); });<\/script></body>
+    </html>
   `);
   printWindow.document.close();
 });
 
 resetBtn.addEventListener('click', () => {
-  selectedFile  = null;
-  optimizedHTML = '';
-  resumeFileInput.value = '';
-  jobDescInput.value    = '';
-  charCount.textContent = '0';
-  hide(fileSelectedBadge);
-  resetPipeline();
-  scoreRingFill.style.strokeDashoffset = '251.2';
-  scoreRingFill.style.stroke = '#3b82f6';
-  scoreValue.textContent = '—';
-  hide(resultsSection);
-  resumePreview.innerHTML = '';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  selectedFile  = null; optimizedHTML = ''; resumeFileInput.value = ''; jobDescInput.value = ''; charCount.textContent = '0';
+  hide(fileSelectedBadge); resetPipeline(); scoreRingFill.style.strokeDashoffset = '251.2'; scoreValue.textContent = '—';
+  hide(resultsSection); resumePreview.innerHTML = ''; window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 document.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-    e.preventDefault();
-    optimizeBtn.click();
-  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); optimizeBtn.click(); }
 });
-
-(function init() {
-  if (window.location.search.includes('demo')) {
-    jobDescInput.value = [
-      'We are looking for a Senior Software Engineer with 5+ years of experience',
-      'in React, Node.js, and AWS. You will architect scalable microservices.',
-    ].join(' ');
-    charCount.textContent = jobDescInput.value.length.toLocaleString();
-  }
-})();
