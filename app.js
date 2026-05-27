@@ -1,13 +1,12 @@
 /**
  * ═══════════════════════════════════════════════════
- * RESUME OPTIMIZER — APP.JS (VERIFIED PRODUCTION FIX)
+ * RESUME OPTIMIZER — APP.JS (DIFY NATIVE 2-STEP UPLOAD)
  * ═══════════════════════════════════════════════════
  */
 
 /* ─── CONFIGURATION ─────────────────────────────── */
-const DIFY_API_URL = 'https://api.dify.ai/v1/workflows/run';
-// ⚠️ SABSE ZARURI: Niche wale single quotes ke andar apni Dify se copy ki hui asli API key paste kijiye
-const DIFY_API_KEY = 'app-JVFbSppqUU1pAzwmKYL3SDRC';   
+const DIFY_BASE_URL = 'https://api.dify.ai/v1';
+const DIFY_API_KEY  = 'app-JVFbSppqUU1pAzwmKYL3SDRC'; // ⚠️ Apni working API Key ek baar check kar lena yahan
 
 /* ─── DOM REFERENCES ────────────────────────────── */
 const optimizeBtn        = document.getElementById('optimizeBtn');
@@ -40,12 +39,12 @@ let loaderInterval  = null;
 
 /* ─── LOADING COPY ROTATION ─────────────────────── */
 const loaderMessages = [
-  'Parsing your resume…',
-  'Extracting skills & experience…',
-  'Running ATS keyword matrix…',
-  'Scoring against job description…',
-  'Compiling executive HTML output…',
-  'Almost there — finalizing…',
+  'Reading your resume file…',
+  'Uploading document to Dify cloud safe…',
+  'Parsing skills & clinical criteria…',
+  'Running ATS keyword optimization…',
+  'Compiling stunning executive HTML output…',
+  'Almost ready — finalizing blocks…',
 ];
 
 /* ─── UTILITY FUNCTIONS ─────────────────────────── */
@@ -61,15 +60,6 @@ function truncateName(name, max = 32) {
   const base = ext > 0 ? name.slice(0, ext) : name;
   const extn = ext > 0 ? name.slice(ext) : '';
   return base.slice(0, max - 4 - extn.length) + '…' + extn;
-}
-
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload  = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = () => reject(new Error('Failed to read file.'));
-    reader.readAsDataURL(file);
-  });
 }
 
 function show(el) { el.hidden = false; }
@@ -133,13 +123,11 @@ function resetPipeline() {
 
 async function runPipelineAnimation() {
   setPipelineState(0, 'active');
-  await delay(1400);
+  await delay(1200);
   setPipelineState(0, 'done');
-
   setPipelineState(1, 'active');
-  await delay(1600);
+  await delay(1400);
   setPipelineState(1, 'done');
-
   setPipelineState(2, 'active');
 }
 
@@ -147,9 +135,7 @@ function finishPipelineAnimation() {
   setPipelineState(2, 'done');
 }
 
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 function startLoaderRotation() {
   let idx = 0;
@@ -201,6 +187,32 @@ function showValidationError(messages) {
   }, 3600);
 }
 
+/* ─── DIFY 2-STEP FILE UPLOAD ENGINE ──────────────── */
+async function uploadFileToDify(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('user', 'resume-optimizer-web');
+
+  const response = await fetch(`${DIFY_BASE_URL}/files/upload`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${DIFY_API_KEY}`
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => 'Upload failed');
+    throw new Error(`Dify Upload Error ${response.status}: ${errText}`);
+  }
+
+  const fileData = await response.json();
+  if (!fileData?.id) {
+    throw new Error('Dify did not return a valid upload file ID.');
+  }
+  return fileData.id; // Returns the valid 'upload_file_id'
+}
+
 /* ─── CORE OPTIMIZE ENGINE ──────────────────────── */
 optimizeBtn.addEventListener('click', async () => {
   if (isProcessing) return;
@@ -222,15 +234,15 @@ optimizeBtn.addEventListener('click', async () => {
   const pipelinePromise = runPipelineAnimation();
 
   try {
-    const base64 = await fileToBase64(selectedFile);
-    
+    // Step 1: Upload file to generate native Dify File ID
+    const uploadFileId = await uploadFileToDify(selectedFile);
+
+    // Step 2: Build payload using the generated file reference block
     const payload = {
       inputs: {
         uploaded_resume: {
           transfer_method: 'local_file',
-          upload_file_id: null,
-          data: base64,
-          filename: selectedFile.name,
+          upload_file_id: uploadFileId,
           type: 'document'
         },
         job_description: jobDescInput.value.trim()
@@ -239,7 +251,8 @@ optimizeBtn.addEventListener('click', async () => {
       user: 'resume-optimizer-web'
     };
 
-    const response = await fetch(DIFY_API_URL, {
+    // Step 3: Run the Workflow
+    const response = await fetch(`${DIFY_BASE_URL}/workflows/run`, {
       method:  'POST',
       headers: {
         'Content-Type':  'application/json',
@@ -250,7 +263,7 @@ optimizeBtn.addEventListener('click', async () => {
 
     if (!response.ok) {
       const errBody = await response.text().catch(() => 'No body');
-      throw new Error(`Dify API error ${response.status}: ${errBody}`);
+      throw new Error(`Dify Engine error ${response.status}: ${errBody}`);
     }
 
     const data = await response.json();
