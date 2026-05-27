@@ -17,7 +17,7 @@
  */
 
 /* ─── CONFIGURATION ─────────────────────────────── */
-const DIFY_API_URL = 'https://api.dify.ai/v1/chat-messages';
+const DIFY_API_URL = 'https://api.dify.ai/v1/workflows/run';
 const DIFY_API_KEY = 'app-JVFbSppqUU1pAzwmKYL3SDRC';   
 
 /* ─── DOM REFERENCES ────────────────────────────── */
@@ -274,7 +274,6 @@ async function buildPayload(base64File, fileName, jobDescription) {
     user: 'resume-optimizer-web',
   };
 }
-
 /* ═══════════════════════════════════════════════════
     PARSE DIFY RESPONSE
     Adjust this function if your Dify output key differs
